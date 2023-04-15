@@ -92,7 +92,7 @@ was built within RPM but this time I did create an actual RPM package.
 For the compile options, see [gcc1040.spec](SPECS/gcc1040.spec).
 
 Once it was build, I deleted the /opt/gcc750 directory and updated the
-`/etc/ld.so.conf.d/bootstrap.conf` to load libraries from
+`/etc/ld.so.conf.d/bootstrap.conf` file to load libraries from
 `/opt/gcc1040/lib` and installed the package.
 
 Again I compiled the `hello.adb` program just to make the Ada part of
@@ -102,4 +102,61 @@ the GCC 10.4.0 build was working.
 Step Three: Build Limited Ada and D enabled GCC 12.2.0 in LFS 11.3
 ------------------------------------------------------------------
 
-foo
+This step probably could have been skipped.
+
+Using the GCC 10.4.0 build, I built an Ada and D enabled build of
+GCC 12.2.0 but again with the additional optional libraries disabled
+from the GCC built. The install prefix was `/opt/gcc1220` and again
+RPM was used, see [gcc1220.spec](SPECS/gcc1220.spec).
+
+Once the RPM was built, I again updated the `/etc/ld.so.conf.d/bootstrap.conf`
+file to load libraries from `/opt/gcc1040/lib` and then I removed the
+`gcc1040` package and installed the `gcc1220` package.
+
+Again I compiled the `hello.adb` program just to make the Ada part of
+the GCC 10.4.0 build was working.
+
+
+Step Four: Build Ada and D Enabled GCC as System GCC
+----------------------------------------------------
+
+I then updated my system [gcc.spec](https://github.com/YellowJacketLinux/LFS/blob/main/SPECS/gcc.spec)
+to build GCC with a prefix of `/usr` and all the optional libraries.
+
+I added the ability to build it using the GCC in `/opt/gcc1220` by
+simply defining the `%{gccbootstrap}` macro when building it.
+
+One built, I deleted the `/etc/ld.so.conf.d/bootstrap.conf` file
+and removed the `gcc1220` package, and upgraded my system GCC packages.
+
+I tested it by again compiling the `hello.adb` program and also by
+building the newly released `linux-2.6.24` kerne.
+
+
+Step Five: Run Tests
+--------------------
+
+Finally I enabled running of the test suites and did one more build
+of the system GCC 12.2.0 package with the tests, which takes over seven
+hours on my hardware (I do not do parallel tests).
+
+The tests results were as good as I could hope.
+
+
+Future LFS
+----------
+
+When I build a future version of LFS, I will deviate from the instructions
+in the book and build GCC with Ada and D support from the start.
+
+Note that doing so would not have worked from CentOS 7 without first
+building another GCC in CentOS 7 because the GCC in CentOS 7 is too old
+to have D support, and while it does have Ada support, GCC 12.2.0 requires
+a newer GCC with Ada support than 4.8.5.
+
+Well, I could have by building an Ada and D capable GCC 10.4.0 in
+CentOS 7.9 but...
+
+Anyway, now that I have modern GCC with Ada and D, I should be able to
+avoid needing to do a bootstrap process again by just always building
+LFS with Ada and D support from the start.
