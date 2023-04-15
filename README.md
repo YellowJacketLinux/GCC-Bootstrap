@@ -8,15 +8,17 @@ Additional languages can then be added by rebuilding GCC in BLFS (see
 but there is a gotcha.
 
 For Ada support (GCC `gnat`) and D support (GCC `gdc`), GCC 12.2.0
-requires that you have are building from a GCC that already has
-`gnat` and `gdc` support.
+requires that you are building from a GCC that already has `gnat` and
+`gdc` support.
 
 GCC has always been that way with respect to `gnat` which I believe was
-originally a separate package merged into GCC, but I believe needing
-`gdc` to build D support is new as of the GCC 12 series.
+originally a separate package merged into GCC. I believe needing `gdc`
+to build D support is new as of the GCC 12 series. D support in GCC
+itself was new in GCC 9 series, and neither the 9 or 10 series require
+an existing `gdc` to build `gdc`.
 
 Anyway, I am not sure that I will ever *personally* need D support but
-Ada is named after Lovelace who is credited with having written the
+Ada is named after Ada Lovelace who is credited with having written the
 first computer program (for an analog mechanical computing device).
 Just for the nostalgia of that name, I do sometimes play with Ada.
 
@@ -26,7 +28,7 @@ So...to get Ada and D into my LFS 11.3/YJL Environment:
 Step One: Build Ada enabled GCC 7.5.0 in CentOS 7.9
 ---------------------------------------------------
 
-CentOS 7.9 (my host for building 11.3) has an ancient GCC 4.8.5 but
+CentOS 7.9 (my host for building LFS 11.3) has an ancient GCC 4.8.5 but
 it does have Ada support.
 
 Using that GCC, I built a vanilla (unpatched) GCC 7.5.0 with Ada
@@ -40,7 +42,7 @@ The build process can be seen in
 [gcc750-centos7.spec](SPECS/gcc750-centos7.spec).
 
 Note that while I did use an RPM spec file build it, I did not actually
-create an RPM file. RPM was just a convenient way to do the build
+create an RPM package. RPM was just a convenient way to do the build
 process, but in the `%install` section I just make a tarball from the
 installed result and then exit RPM via `/bin/false`.
 
@@ -59,13 +61,13 @@ with the GCC 7.5.0 shared libraries.
 A more elegant solution would have been to build the newer versions
 of those libraries to link GCC 7.5.0 against but I did not do that.
 
-After copying the tarball out of the BUILDROOT I booted into LFS 11.3,
-created a `/etc/ld.so.conf.d/bootstrap.conf` file containing
+After copying the compiled tarball out of the RPM `BUILDROOT` I booted
+into LFS 11.3, created a `/etc/ld.so.conf.d/bootstrap.conf` file containing
 `/opt/gcc750/lib`, unpacked the tarball in `/opt`, and then ran
 `/sbin/ldconfig` so that the GCC 7.5.0 build could load all the
 libraries it needed.
 
-To test that it working, I added `/opt/gcc750/bin` to patch and
+To test that it working, I added `/opt/gcc750/bin` to my `$PATH` and
 compiled the [hello.adb](hello.adb) program:
 
     gnatmake hello.adb
@@ -110,11 +112,11 @@ from the GCC built. The install prefix was `/opt/gcc1220` and again
 RPM was used, see [gcc1220.spec](SPECS/gcc1220.spec).
 
 Once the RPM was built, I again updated the `/etc/ld.so.conf.d/bootstrap.conf`
-file to load libraries from `/opt/gcc1040/lib` and then I removed the
+file to load libraries from `/opt/gcc1220/lib` and then I removed the
 `gcc1040` package and installed the `gcc1220` package.
 
 Again I compiled the `hello.adb` program just to make the Ada part of
-the GCC 10.4.0 build was working.
+the GCC 12.2.0 build was working.
 
 
 Step Four: Build Ada and D Enabled GCC as System GCC
@@ -126,7 +128,7 @@ to build GCC with a prefix of `/usr` and all the optional libraries.
 I added the ability to build it using the GCC in `/opt/gcc1220` by
 simply defining the `%{gccbootstrap}` macro when building it.
 
-One built, I deleted the `/etc/ld.so.conf.d/bootstrap.conf` file
+Once built, I deleted the `/etc/ld.so.conf.d/bootstrap.conf` file
 and removed the `gcc1220` package, and upgraded my system GCC packages.
 
 I tested it by again compiling the `hello.adb` program and also by
@@ -138,9 +140,11 @@ Step Five: Run Tests
 
 Finally I enabled running of the test suites and did one more build
 of the system GCC 12.2.0 package with the tests, which takes over seven
-hours on my hardware (I do not do parallel tests).
+hours (build plus tests) on my hardware as I do not do parallel tests.
 
 The tests results were as good as I could hope.
+
+See [gcc-make.check.log](gcc-make.check.log)
 
 
 Future LFS
@@ -154,9 +158,17 @@ building another GCC in CentOS 7 because the GCC in CentOS 7 is too old
 to have D support, and while it does have Ada support, GCC 12.2.0 requires
 a newer GCC with Ada support than 4.8.5.
 
-Well, I could have by building an Ada and D capable GCC 10.4.0 in
-CentOS 7.9 but...
-
 Anyway, now that I have modern GCC with Ada and D, I should be able to
 avoid needing to do a bootstrap process again by just always building
 LFS with Ada and D support from the start.
+
+### Plan B
+
+In the event adding Ada and D to the configuration of GCC during the
+initial building of LFS causes a failure, then within LFS 11.3 I can
+create a similar `/opt/gccNNNN` from which to bootstrap GCC in the new
+LFS for Ada and D support.
+
+I do not think that will be necessary as it does not appear there are
+any build dependencies for Ada and D outside of a GCC of recent enough
+version that has both Ada and D.
