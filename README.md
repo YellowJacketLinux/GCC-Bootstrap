@@ -72,3 +72,34 @@ compiled the [hello.adb](hello.adb) program:
 
 When the program compiled without a segfault and ran without a segfault
 I knew I was probably good to continue.
+
+
+Step Two: Build Ada and D enabled GCC 10.4.0 in LFS 11.3
+--------------------------------------------------------
+
+GCC 10.4.0 does require a working `gnat` to build Ada support, which
+I had via the CentOS 7 compiled GCC 7.5.0, but that version of GCC
+still allows building D support without needing an existing `gdc`
+compiler.
+
+So using the Ada capable GCC 7.5.0, I built an Ada and D capable
+GCC 10.4.0.
+
+This build was built with `/opt/gcc1040` as the install prefix and also
+was done without building the optional additional libraries and it also
+was built within RPM but this time I did create an actual RPM package.
+
+For the compile options, see [gcc1040.spec](SPECS/gcc1040.spec).
+
+Once it was build, I deleted the /opt/gcc750 directory and updated the
+`/etc/ld.so.conf.d/bootstrap.conf` to load libraries from
+`/opt/gcc1040/lib` and installed the package.
+
+Again I compiled the `hello.adb` program just to make the Ada part of
+the GCC 10.4.0 build was working.
+
+
+Step Three: Build Limited Ada and D enabled GCC 12.2.0 in LFS 11.3
+------------------------------------------------------------------
+
+foo
