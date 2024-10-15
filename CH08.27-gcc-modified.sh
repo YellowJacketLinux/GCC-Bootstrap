@@ -27,11 +27,9 @@ mkdir build && cd build
             LD=ld \
             --enable-default-pie     \
             --enable-default-ssp     \
-            --enable-host-pie        \
             --disable-multilib       \
             --disable-fixincludes    \
             --with-system-zlib       \
-            --enable-libada          \
             --enable-linker-build-id \
             --enable-languages=c,c++,ada,d
 
