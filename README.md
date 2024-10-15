@@ -59,31 +59,82 @@ was probably good to go.
 Step Two: Build Ada and D enabled GCC 14.2.0 in LFS 12.2
 --------------------------------------------------------
 
-Theoretically this step could be skipped but I would rather be safe.
+Theoretically this step could be skipped and I could have built the system GCC
+without this step but I would rather be safe.
 
-Using the `/opt/gcc-preboostrap` build of GCC 14.2.0, I will rebuild it in LFS
-12.2 with the same configure options except using an install target of
-`/opt/gcc-bootstrap`.
+Using the `/opt/gcc-preboostrap` build of GCC 14.2.0 as the compiler, I did an
+identical build within LFS 12.2 but using `/opt/gcc-bootstrap` as the install
+prefix. This was done with the script
+[`build-bootstrap.sh`](build-bootstrap.sh) (in this git) within my LFS 12.2
+system.
 
-In this case, I will not to attempt to compile the `hello.adb` program after
-the build because the test suite will have tested that it works in the LFS 12.2
-host it is built in.
+In this case, since I was building the compiler that would then build the system
+compiler, I did run the test suite after it finished (and it takes a long time).
 
-Once built and installed, the `/opt/gcc-prebootstrap` directory can be deleted.
-The `/etc/ld.so.conf.d/gcc-prebootstrap.conf` file gets renamed to
-`/etc/ld.so.conf.d/gcc-bootstrap.conf` and the path inside changed to
-`/opt/gcc-preboostrap/lib` re-running `ldconfig` to update the library linker.
+There were a few unexpected errors but when building GCC there *always* are. The
+tests that had unexpected errors are shown below:
+
+                    === libphobos Summary ===
+    
+    # of expected passes            412
+    # of unexpected failures        3
+    
+    ...
+    
+                    === libphobos Summary ===
+    
+    # of expected passes            389
+    # of unexpected failures        1
+    
+    ...
+    
+                    === gcc Summary ===
+    
+    # of expected passes            88026
+    # of unexpected failures        2
+    # of expected failures          776
+    # of unsupported tests          1611
+    
+    ...
+    
+                    === g++ Summary ===
+    
+    # of expected passes            15870
+    # of unexpected failures        2
+    # of expected failures          32
+    # of unsupported tests          209
+
+Summaries from the log file *without* unexpected failures are not shown. I was
+very happy with the test results. 
+ 
+Once built and installed, I did make a tarball of `/opt/gcc-bootstrap` just in
+case I screw the system up and need to re-install LFS 12.2, I can then use that
+tarball to go straight to Step Three.
+
+The `/opt/gcc-prebootstrap` directory was then deleted and the
+`/etc/ld.so.conf.d/gcc-prebootstrap.conf` file was renamed to
+`/etc/ld.so.conf.d/gcc-bootstrap.conf` with the path in it updated to point to
+`/opt/gcc-preboostrap/lib`, of course re-running `ldconfig` afterwards.
+
+The system is now ready to build the Ada and D capable GCC as the system GCC
+with an install prefix of `/usr`.
 
 
 Step Three: Build Ada and D enabled GCC 14.2.0 with `/usr` prefix
 -----------------------------------------------------------------
 
-Using the `/opt/gcc-bootstrap` build of GCC 14.2.0, it will be built once again
-except using `/usr` as the install prefix, *replacing* the GCC 14.2.0 built
-during the build of LFS 12.2.
+This will be done tonight when I have a large block of time for which I do not
+need use my PC for other things, using the script
+[`CH08.27-gcc-modified.sh`](CH08.27-gcc-modified.sh) (in this git) within my LFS
+12.2 system.
 
-This build will use the same build options as the LFS Chapter 8 build of GCC
-except with the following:
+The build will use the same build options as the LFS Chapter 8 build of GCC
+except with the following configure options removed:
+
+    --enable-languages=c,c++ \
+    --disable-bootstrap      \
+
+and the following configure options added:
 
     --enable-libada \
     --enable-linker-build-id \
