@@ -1,5 +1,16 @@
 #!/bin/bash
 
+if [ "`whoami`" == "root" ]; then
+  echo "Danger, Will Robinson!"
+  echo "Do not execute me as r00t"
+  exit 1
+elif [ ! -f gcc-14.2.0.tar.xz ]; then
+  echo "The GCC source tarball gcc-14.2.0.tar.xz"
+  echo "must exist in same directory this script"
+  echo "is run from."
+  exit 1
+fi
+
 [ -d gcc-14.2.0 ] && rm -rf gcc-14.2.0
 
 tar -Jxf gcc-14.2.0.tar.xz
