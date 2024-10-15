@@ -18,30 +18,30 @@ So...to get Ada and D into my LFS 12.2/YJL Environment:
 Step One: Build Ada enabled GCC 12.2 in LFS 11.3
 ------------------------------------------------
 
-In LFS 11.3, use the Ada and D capable GCC 12.2.0 to compile an Ada and D
+In LFS 11.3, I used the Ada and D capable GCC 12.2.0 to compile an Ada and D
 capable GCC 14.2.0.
 
-The GCC 12.2.0 built in LFS 11.2 will have an install target of
-`/opt/gcc-prebootstrap` and will only be built for support for `c`,`c++`,`d`,
-and `ada`.
+The GCC 12.2.0 built in LFS 11.2 has an install target of
+`/opt/gcc-prebootstrap` and was only built with support for `c`,`c++`,`d`, and
+`ada`.
 
-Once built, the directory `/opt/gcc-preboostrap` will be packed into a tarball.
+Once built, the directory `/opt/gcc-preboostrap` was packed into a tarball to be
+unpacked in the same location in the LFS 12.2 environment.
 
 Note that (other than glibc) GCC only has three library dependencies outside of
 GCC itself:
 
-* MPFR
-* GMP
-* MPC
+* MPFR (libmpfr.so.6 in LFS 12.2)
+* GMP (libgmp.so.10, libgmpxx.so.4 in LFS 12.2)
+* MPC (libmpc.so.3 in LFS 12.2)
 
-If any of those libraries have an ABI compatibility issue between LFS 11.3 and
-LFS 12.2 (I have not checked yet), then the LFS 11.3 versions of those libraries
-will be copies into the `/opt/gcc-prebootstrap/lib` directory before making the
-tarball and a file called `/etc/ld.so.conf.d/prebootstrap.conf` in LFS 12.2
-containing `/opt/gcc-preboostrap/lib` will tell the dynamic library linker where
-to find them.
+Since those are the same ABI versions in LFS 12.2, I did not need to worry about
+copying the the LFS 11.3 versions into `/opt/gcc-preboostrap/lib` but I still
+needed to make a file called `/etc/ld.so.conf.d/gcc-prebootstrap.conf` in
+LFS 12.2 containing `/opt/gcc-preboostrap/lib` to tell the dynamic library
+linker where the new GCC libraries are.
 
-The tarball will be unpacked into LFS 12.2.
+The tarball will be unpacked into LFS 12.2 for Step Two.
 
 To test that it working, I'll add `/opt/gcc-prebootstrap/bin` to my `$PATH` and
 compiled the [hello.adb](hello.adb) program:
@@ -54,6 +54,8 @@ know I am probably good to go.
 
 Step Two: Build Ada and D enabled GCC 14.2.0 in LFS 12.2
 --------------------------------------------------------
+
+Theoretically this step could be skipped but I would rather be safe.
 
 Using the `/opt/gcc-preboostrap` build of GCC 14.2.0, I will rebuild it in LFS
 12.2 with the same configure options except using an install target of
@@ -72,7 +74,18 @@ Using the `/opt/gcc-bootstrap` build of GCC 14.2.0, it will be built once again
 except using `/usr` as the install prefix, *replacing* the GCC 14.2.0 built
 during the build of LFS 12.2.
 
-Phase Two of `THE-PLAN.md` will be complete.
+This build will use the same build options as the LFS Chapter 8 build of GCC
+except with the following:
+
+    --enable-libada \
+    --enable-linker-build-id \
+    --enable-languages=c,c++,ada,d
+
+Of course, to build it, it will use the freshly built GCC from
+`/opt/gcc-bootstrap`
+
+Phase Two of `THE-PLAN.md` will be complete. `/opt/gcc-bootstrap` can be deleted
+and the `/etc/ld.so.conf.d/gcc-bootstrap.conf` file can be deleted.
 
 
 Future GCC
