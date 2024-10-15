@@ -72,12 +72,12 @@ Using the `/opt/gcc-bootstrap` build of GCC 14.2.0, it will be built once again
 except using `/usr` as the install prefix, *replacing* the GCC 14.2.0 built
 during the build of LFS 12.2.
 
-Phase Two of `THE_PLAN.md` will be complete.
+Phase Two of `THE-PLAN.md` will be complete.
 
 
 Future GCC
 ----------
 
-During ‘Phase Four’ of `THE_PLAN.md` (RPM Bootstrap), GCC will be rebuilt as RPM
+During ‘Phase Four’ of `THE-PLAN.md` (RPM Bootstrap), GCC will be rebuilt as RPM
 packages. During that rebuild, support for all the other languages GCC supports
 will be built.
