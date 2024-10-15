@@ -20,7 +20,7 @@ Step One: Build Ada enabled GCC 12.2 in LFS 11.3
 
 In LFS 11.3, I used the Ada and D capable GCC 12.2.0 to compile an Ada and D
 capable GCC 14.2.0. This was done using the script
-[build-pre-bootstrap.sh](`build-pre-bootstrap.sh`) (in this git) within my LFS
+[`build-pre-bootstrap.sh`](build-pre-bootstrap.sh) (in this git) within my LFS
 11.3 system.
 
 The GCC 12.2.0 the script built in LFS 11.3 has an install target of
