@@ -19,9 +19,11 @@ Step One: Build Ada enabled GCC 12.2 in LFS 11.3
 ------------------------------------------------
 
 In LFS 11.3, I used the Ada and D capable GCC 12.2.0 to compile an Ada and D
-capable GCC 14.2.0.
+capable GCC 14.2.0. This was done using the script
+[build-pre-bootstrap.sh](`build-pre-bootstrap.sh`) (in this git) within my LFS
+11.3 system.
 
-The GCC 12.2.0 built in LFS 11.2 has an install target of
+The GCC 12.2.0 the script built in LFS 11.3 has an install target of
 `/opt/gcc-prebootstrap` and was only built with support for `c`,`c++`,`d`, and
 `ada`.
 
@@ -35,7 +37,7 @@ GCC itself:
 * GMP (libgmp.so.10, libgmpxx.so.4 in LFS 12.2)
 * MPC (libmpc.so.3 in LFS 12.2)
 
-Since those are the same ABI versions in LFS 12.2, I did not need to worry about
+Since those are the same ABI versions in LFS 11.3, I did not need to worry about
 copying the the LFS 11.3 versions into `/opt/gcc-preboostrap/lib`.
 
 The tarball was unpacked into LFS 12.2 for Step Two. The file
