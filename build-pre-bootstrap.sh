@@ -36,6 +36,6 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo "build complete. As root, run make install."
+echo "build complete. As root, run make install (inside build directory)."
 
 # note - tests are not run at this point, way too time consuming.

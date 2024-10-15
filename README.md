@@ -36,20 +36,22 @@ GCC itself:
 * MPC (libmpc.so.3 in LFS 12.2)
 
 Since those are the same ABI versions in LFS 12.2, I did not need to worry about
-copying the the LFS 11.3 versions into `/opt/gcc-preboostrap/lib` but I still
-needed to make a file called `/etc/ld.so.conf.d/gcc-prebootstrap.conf` in
-LFS 12.2 containing `/opt/gcc-preboostrap/lib` to tell the dynamic library
-linker where the new GCC libraries are.
+copying the the LFS 11.3 versions into `/opt/gcc-preboostrap/lib`.
 
-The tarball will be unpacked into LFS 12.2 for Step Two.
+The tarball was unpacked into LFS 12.2 for Step Two. The file
+`/etc/ld.so.conf.d/gcc-prebootstrap.conf` was created containing:
 
-To test that it working, I'll add `/opt/gcc-prebootstrap/bin` to my `$PATH` and
-compiled the [hello.adb](hello.adb) program:
+    /opt/gcc-preboostrap/lib
+
+I then ran `ldconfig` as root so the linker knew where the libraries are.
+
+To test that it working in LFS 12.2, I added `/opt/gcc-prebootstrap/bin` to my
+`$PATH` and compiled the [hello.adb](hello.adb) program:
 
     gnatmake hello.adb
 
-If the program compiles without a segfault and runs without a segfault I will
-know I am probably good to go.
+The program compiled without a segfault and ran without a segfault so I knew I
+was probably good to go.
 
 
 Step Two: Build Ada and D enabled GCC 14.2.0 in LFS 12.2
@@ -62,10 +64,14 @@ Using the `/opt/gcc-preboostrap` build of GCC 14.2.0, I will rebuild it in LFS
 `/opt/gcc-bootstrap`.
 
 In this case, I will not to attempt to compile the `hello.adb` program after
-the build because the test suite will test that it works in the LFS 12.2 host it
-is built in.
+the build because the test suite will have tested that it works in the LFS 12.2
+host it is built in.
 
 Once built and installed, the `/opt/gcc-prebootstrap` directory can be deleted.
+The `/etc/ld.so.conf.d/gcc-prebootstrap.conf` file gets renamed to
+`/etc/ld.so.conf.d/gcc-bootstrap.conf` and the path inside changed to
+`/opt/gcc-preboostrap/lib` re-running `ldconfig` to update the library linker.
+
 
 Step Three: Build Ada and D enabled GCC 14.2.0 with `/usr` prefix
 -----------------------------------------------------------------
